@@ -6,7 +6,7 @@
 
 # Want to help us make this template better? Share your feedback here: https://forms.gle/ybq9Krt8jtBL3iCk7
 
-ARG PYTHON_VERSION=3.12.3
+ARG PYTHON_VERSION=3.12
 FROM python:${PYTHON_VERSION}-slim as base
 
 # Prevents Python from writing pyc files.
@@ -16,8 +16,18 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # the application crashes without emitting any logs due to buffering.
 ENV PYTHONUNBUFFERED=1
 
+# Create the app directory
+RUN mkdir /app
+
+# Set the working directory
 WORKDIR /app
 
+COPY requirements.txt /app/
+
+# Upgrade pip and install dependencies
+RUN pip install --upgrade pip 
+
+# Copy the requirements file first (better caching)
 COPY requirements.txt /app/
 
 # Create a non-privileged user that the app will run under.
@@ -33,22 +43,18 @@ RUN adduser \
     --uid "${UID}" \
     appuser
 
-# Download dependencies as a separate step to take advantage of Docker's caching.
-# Leverage a cache mount to /root/.cache/pip to speed up subsequent builds.
-# Leverage a bind mount to requirements.txt to avoid having to copy them into
-# into this layer.
-RUN --mount=type=cache,target=/root/.cache/pip \
-    --mount=type=bind,source=requirements.txt,target=requirements.txt \
-    python -m pip install -r requirements.txt
+# run this command to install all dependencies 
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Switch to the non-privileged user to run the application.
-USER appuser
-
-# Copy the source code into the container.
-COPY . ./app/
+# Copy the Django project to the container
+COPY . /app/
 
 # Expose the port that the application listens on.
 EXPOSE 8080
-
+ 
 # Run the application.
 CMD run
+
+# TODO: figure this out later
+# # Run Django’s development server
+# CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
