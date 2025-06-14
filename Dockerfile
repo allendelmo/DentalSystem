@@ -18,9 +18,12 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
+COPY requirements.txt /app/
+
 # Create a non-privileged user that the app will run under.
 # See https://docs.docker.com/go/dockerfile-user-best-practices/
 ARG UID=10001
+ARG USERNAME=appuser
 RUN adduser \
     --disabled-password \
     --gecos "" \
@@ -42,7 +45,7 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 USER appuser
 
 # Copy the source code into the container.
-COPY . /app/
+COPY . ./app/
 
 # Expose the port that the application listens on.
 EXPOSE 8080
