@@ -1,5 +1,6 @@
 # Python virtual environment
 venv/
 python-venv/
+dental-venv/
 
 **/__pycache__
