@@ -13,4 +13,4 @@ class Patient(models.Model):
     emergency_contact = models.CharField()
 
     def __str__(self):
-        return self.first_name 
+        return self.email 
