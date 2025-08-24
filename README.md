@@ -1,9 +1,10 @@
 # DentalSystem
 
-# Install npm
+# Running the backend
+## start the server
 ```
+python manage.py runserver
 ```
-
 
 # Running the frontend
 ## go to front end directory
